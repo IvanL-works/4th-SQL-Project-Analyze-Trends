@@ -1,0 +1,57 @@
+#What are the top five stories with the highest scores
+-- SELECT title, score
+-- FROM hacker_news
+-- ORDER BY score DESC
+-- LIMIT 5;
+
+#Find the total score of all the stories.
+-- SELECT SUM(score)
+-- FROM hacker_news;
+
+#Find the individual users who have gotten combined scores of more than 200, and their combined scores.
+-- SELECT user, SUM(score) as total_score
+-- FROM hacker_news
+-- GROUP BY user
+-- HAVING total_score > 200;
+
+#Add these users’ scores together and divide by the total to get the percentage. 
+-- WITH top_users AS (
+--   SELECT user, SUM(score) as total_score
+--   FROM hacker_news
+--   GROUP BY user
+--   HAVING total_score > 200
+--   )
+-- SELECT SUM(tu.total_score)*100/(
+--                             SELECT SUM(score)
+--                             FROM hacker_news
+--                             ) as share_top_contributors
+-- FROM top_users tu;
+
+#Some users are rickrolling. How many times has each offending user posted the link?
+-- SELECT user, COUNT(*)
+-- FROM hacker_news
+-- WHERE url LIKE '%watch?v=dQw4w9WgXcQ'
+-- GROUP BY user;
+
+#Which of these sites feed Hacker News the most:
+#GitHub, Medium, or New York Times?
+
+-- SELECT CASE
+--    WHEN url LIKE '%github.com%' THEN 'GitHub'
+--    WHEN url LIKE '%Medium.com%' THEN 'Medium'
+--    WHEN url LIKE '%nytimes.com%' THEN 'New York Times'
+--    ELSE 'Others'
+--   END AS 'Source',
+--   COUNT(*)
+-- FROM hacker_news
+-- GROUP BY 1;
+
+#What's the best time to post a story?'
+SELECT strftime('%H',timestamp) AS hour, 
+      ROUND(AVG(score),2) AS average_score,
+      COUNT(*) AS number_of_stories
+FROM hacker_news
+WHERE timestamp is NOT NULL
+GROUP BY 1
+ORDER BY 2 DESC;
+
